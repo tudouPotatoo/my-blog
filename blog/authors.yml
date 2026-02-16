@@ -23,3 +23,17 @@ slorber:
     linkedin: sebastienlorber
     github: slorber
     newsletter: https://thisweekinreact.com
+
+tudouPotatoo:
+  name: tudouPotatoo
+  title: software engineer
+  url: https://github.com/tudouPotatoo
+  image_url: https://github.com/tudouPotatoo.png
+  page:
+    # customize the url of the author page at /blog/authors/<permalink>
+    permalink: '/tudou-potatoo'
+  socials:
+    x: sebastienlorber
+    linkedin: sebastienlorber
+    github: tudouPotatoo
+    newsletter: https://thisweekinreact.com
