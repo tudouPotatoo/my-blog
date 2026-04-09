@@ -48,7 +48,7 @@ public TicketPurchaseRespDTO purchaseTickets(PurchaseTicketReqDTO requestParam) 
 
 在看具体代码之前，我们先看一下12306项目购票请求责任链的UML类图。
 
-![12306购票请求责任链](12306-ChainOfResponsibility.assets/12306购票请求责任链.svg)
+![12306-purchase-ticket-chain-of-responsibility](12306-ChainOfResponsibility.assets/12306-purchase-ticket-chain-of-responsibility.svg)
 
 1. 首先看到右上方`Ordered`接口，这是Spring提供的的一个核心接口，这个接口只有一个`getOrder`方法，可以通过这个方法来决定责任链中的处理器的执行顺序。
 
@@ -297,4 +297,4 @@ public class TicketServiceImpl extends ServiceImpl<TicketMapper, TicketDO> imple
 
 通过时序图，可以清晰地看出，其实这个购票请求责任链，就是在购票逻辑之前的一系列filter，通过了这些filter的校验才可以真正执行购票逻辑，只要有其中一个filter没有通过，就会直接抛出异常。
 
-![12306购票请求责任链时序图](12306-ChainOfResponsibility.assets/12306购票请求责任链时序图.svg)
+![12306-purchase-ticket-sequence](12306-ChainOfResponsibility.assets/12306-purchase-ticket-sequence.svg)
