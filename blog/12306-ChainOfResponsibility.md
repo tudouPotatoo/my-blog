@@ -95,7 +95,7 @@ public TicketPurchaseRespDTO purchaseTickets(PurchaseTicketReqDTO requestParam) 
 
 下面是相关的代码（为保证最佳的阅读体验，只贴出最核心的代码，完整的代码可以参考12306项目的开源代码）：
 
-#### 3.1 责任链实现原理
+### 3.1 责任链实现原理
 
 `ApplicationContextHolder` 工具类，用于获取Bean
 
@@ -275,7 +275,7 @@ public class TrainPurchaseTicketParamVerifyChainHandler implements TrainPurchase
 
 
 
-#### 3.2 使用购票请求责任链
+### 3.2 使用购票请求责任链
 
 ```java
 @Service
