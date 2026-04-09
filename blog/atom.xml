@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://tudouPotatoo.github.io/my-blog/blog</id>
     <title>My Site Blog</title>
-    <updated>2026-04-08T06:31:08.753Z</updated>
+    <updated>2026-04-09T03:31:54.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://tudouPotatoo.github.io/my-blog/blog"/>
     <subtitle>My Site Blog</subtitle>
@@ -11,7 +11,7 @@
         <title type="html"><![CDATA[12306购票校验责任链]]></title>
         <id>https://tudouPotatoo.github.io/my-blog/blog/12306-ChainOf Responsibility</id>
         <link href="https://tudouPotatoo.github.io/my-blog/blog/12306-ChainOf Responsibility"/>
-        <updated>2026-04-08T06:31:08.753Z</updated>
+        <updated>2026-04-09T03:31:54.000Z</updated>
         <summary type="html"><![CDATA[1. 背景]]></summary>
         <content type="html"><![CDATA[<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="1-背景">1. 背景<a href="https://tudoupotatoo.github.io/my-blog/blog/12306-ChainOf%20Responsibility#1-%E8%83%8C%E6%99%AF" class="hash-link" aria-label="1. 背景的直接链接" title="1. 背景的直接链接" translate="no">​</a></h2>
 <p>在12306项目中，用户可以发起购票请求，在真正执行创建订单-扣减库存等操作之前，需要先验证一下当前用户是否有购票资格，其伪代码如下：</p>
