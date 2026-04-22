@@ -1,3 +1,13 @@
+---
+slug: 12306-chain-of-responsibility
+title: 12306 核心实践：购票校验责任链
+authors: [tudouPotatoo]
+tags: [Java, 设计模式, 高并发, 12306项目]
+---
+
+自上而下学习，通过12306的购票校验责任链来学习责任链设计模式
+<!-- truncate -->
+
 # 12306购票校验责任链
 
 ## 1. 背景
