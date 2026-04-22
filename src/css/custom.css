@@ -4,6 +4,19 @@
  * work well for content-centric websites.
  */
 
+/* 1. 直接从本地 node_modules 引入样式，无视网络和校验问题 */
+@import "katex/dist/katex.min.css";
+
+/* 2. 隐藏那个没有样式的 MathML 层（丑公式） */
+.katex-mathml {
+  display: none !important;
+}
+
+/* 3. 确保真正的公式层（漂亮公式）显示出来 */
+.katex-html {
+  display: inline-block;
+}
+
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #2e8555;
