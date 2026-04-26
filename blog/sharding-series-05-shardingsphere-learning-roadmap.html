@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="zh-Hans" dir="ltr" class="blog-wrapper blog-post-page plugin-blog plugin-id-default" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Sharding Journey 05：从零到一，我的 ShardingSphere 摸索与进阶之路 | My Site</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://tudouPotatoo.github.io/my-blog/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://tudouPotatoo.github.io/my-blog/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://tudouPotatoo.github.io/my-blog/blog/sharding-series-05-shardingsphere-learning-roadmap"><meta data-rh="true" property="og:locale" content="zh_Hans"><meta data-rh="true" name="docusaurus_locale" content="zh-Hans"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="zh-Hans"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="Sharding Journey 05：从零到一，我的 ShardingSphere 摸索与进阶之路 | My Site"><meta data-rh="true" name="description" content="最开始，是在看12306项目文档介绍数据库表如何设计的时候，感觉看的有些一知半解，看评论区有人推荐这部分内容先去学了分库分表再回来看，因此我决定先去学分库分表。"><meta data-rh="true" property="og:description" content="最开始，是在看12306项目文档介绍数据库表如何设计的时候，感觉看的有些一知半解，看评论区有人推荐这部分内容先去学了分库分表再回来看，因此我决定先去学分库分表。"><meta data-rh="true" property="og:type" content="article"><meta data-rh="true" property="article:published_time" content="2026-04-26T12:49:09.000Z"><meta data-rh="true" property="article:author" content="https://github.com/tudouPotatoo"><meta data-rh="true" property="article:tag" content="学习心得,程序员成长,经验总结"><link data-rh="true" rel="icon" href="/my-blog/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://tudouPotatoo.github.io/my-blog/blog/sharding-series-05-shardingsphere-learning-roadmap"><link data-rh="true" rel="alternate" href="https://tudouPotatoo.github.io/my-blog/blog/sharding-series-05-shardingsphere-learning-roadmap" hreflang="zh-Hans"><link data-rh="true" rel="alternate" href="https://tudouPotatoo.github.io/my-blog/blog/sharding-series-05-shardingsphere-learning-roadmap" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","@id":"https://tudouPotatoo.github.io/my-blog/blog/sharding-series-05-shardingsphere-learning-roadmap","mainEntityOfPage":"https://tudouPotatoo.github.io/my-blog/blog/sharding-series-05-shardingsphere-learning-roadmap","url":"https://tudouPotatoo.github.io/my-blog/blog/sharding-series-05-shardingsphere-learning-roadmap","headline":"Sharding Journey 05：从零到一，我的 ShardingSphere 摸索与进阶之路","name":"Sharding Journey 05：从零到一，我的 ShardingSphere 摸索与进阶之路","description":"最开始，是在看12306项目文档介绍数据库表如何设计的时候，感觉看的有些一知半解，看评论区有人推荐这部分内容先去学了分库分表再回来看，因此我决定先去学分库分表。","datePublished":"2026-04-26T12:49:09.000Z","author":{"@type":"Person","name":"tudouPotatoo","description":"software engineer","url":"https://github.com/tudouPotatoo","image":"https://github.com/tudouPotatoo.png"},"keywords":[],"isPartOf":{"@type":"Blog","@id":"https://tudouPotatoo.github.io/my-blog/blog","name":"Blog"}}</script><link rel="alternate" type="application/rss+xml" href="/my-blog/blog/rss.xml" title="My Site RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/my-blog/blog/atom.xml" title="My Site Atom Feed"><link rel="stylesheet" href="/my-blog/assets/css/styles.b5f1386e.css">
+<script src="/my-blog/assets/js/runtime~main.3275121e.js" defer="defer"></script>
+<script src="/my-blog/assets/js/main.19072f1b.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><link rel="preload" as="image" href="/my-blog/img/logo.svg"><link rel="preload" as="image" href="https://github.com/tudouPotatoo.png"><div role="region" aria-label="跳到主要内容"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">跳到主要内容</a></div><nav aria-label="主导航" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="切换导航栏" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/my-blog/"><div class="navbar__logo"><img src="/my-blog/img/logo.svg" alt="My Site Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/my-blog/img/logo.svg" alt="My Site Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">My Site</b></a><a class="navbar__item navbar__link" href="/my-blog/docs/intro">Tutorial</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/my-blog/blog">Blog</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/facebook/docusaurus" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="切换浅色/暗黑模式（当前为system mode）"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="container margin-vert--lg"><div class="row"><aside class="col col--3"><nav class="sidebar_re4s thin-scrollbar" aria-label="最近博文导航"><div class="sidebarItemTitle_pO2u margin-bottom--md">Recent posts</div><div role="group"><h3 class="yearGroupHeading_rMGB">2026</h3><ul class="sidebarItemList_Yudw clean-list"><li class="sidebarItem__DBe"><a class="sidebarItemLink_mo7H" href="/my-blog/blog/sharding-series-01-foundations">Sharding Journey 01：深入浅出分库分表基础理论</a></li><li class="sidebarItem__DBe"><a class="sidebarItemLink_mo7H" href="/my-blog/blog/sharding-series-02-advanced">Sharding Journey 02：深入浅出分库分表进阶理论知识</a></li><li class="sidebarItem__DBe"><a class="sidebarItemLink_mo7H" href="/my-blog/blog/sharding-series-03-shardingsphere-intro">Sharding Journey 03：ShardingSphere理论与实践</a></li><li class="sidebarItem__DBe"><a class="sidebarItemLink_mo7H" href="/my-blog/blog/sharding-series-04-shardingsphere-examples">Sharding Journey 04：手把手教你跑通 ShardingSphere-Example 示例项目</a></li><li class="sidebarItem__DBe"><a aria-current="page" class="sidebarItemLink_mo7H sidebarItemLinkActive_I1ZP" href="/my-blog/blog/sharding-series-05-shardingsphere-learning-roadmap">Sharding Journey 05：从零到一，我的 ShardingSphere 摸索与进阶之路</a></li></ul></div></nav></aside><main class="col col--7"><article class=""><header><h1 class="title_f1Hy">Sharding Journey 05：从零到一，我的 ShardingSphere 摸索与进阶之路</h1><div class="container_mt6G margin-vert--md"><time datetime="2026-04-26T12:49:09.000Z">2026年4月26日</time> · <!-- -->阅读需 19 分钟</div><div class="margin-top--md margin-bottom--sm row"><div class="col col--12 authorCol_Hf19"><div class="avatar margin-bottom--sm"><a class="avatar__photo-link" href="/my-blog/blog/authors/tudou-potatoo"><img class="avatar__photo authorImage_XqGP" src="https://github.com/tudouPotatoo.png" alt="tudouPotatoo"></a><div class="avatar__intro authorDetails_lV9A"><div class="avatar__name"><a href="/my-blog/blog/authors/tudou-potatoo"><span class="authorName_yefp" translate="no">tudouPotatoo</span></a></div><small class="authorTitle_nd0D" title="software engineer">software engineer</small><div class="authorSocials_rSDt"><a href="https://x.com/sebastienlorber" target="_blank" rel="noopener noreferrer" class="authorSocialLink_owbf" title="X"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 1200 1227" style="--dark:#000;--light:#fff" class="authorSocialIcon_XYv3 xSvg_y3PF"><path d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z"></path></svg></a><a href="https://www.linkedin.com/in/sebastienlorber/" target="_blank" rel="noopener noreferrer" class="authorSocialLink_owbf" title="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid" viewBox="0 0 256 256" style="--dark:#0a66c2;--light:#ffffffe6" class="authorSocialIcon_XYv3 linkedinSvg_FCgI"><path d="M218.123 218.127h-37.931v-59.403c0-14.165-.253-32.4-19.728-32.4-19.756 0-22.779 15.434-22.779 31.369v60.43h-37.93V95.967h36.413v16.694h.51a39.907 39.907 0 0 1 35.928-19.733c38.445 0 45.533 25.288 45.533 58.186l-.016 67.013ZM56.955 79.27c-12.157.002-22.014-9.852-22.016-22.009-.002-12.157 9.851-22.014 22.008-22.016 12.157-.003 22.014 9.851 22.016 22.008A22.013 22.013 0 0 1 56.955 79.27m18.966 138.858H37.95V95.967h37.97v122.16ZM237.033.018H18.89C8.58-.098.125 8.161-.001 18.471v219.053c.122 10.315 8.576 18.582 18.89 18.474h218.144c10.336.128 18.823-8.139 18.966-18.474V18.454c-.147-10.33-8.635-18.588-18.966-18.453"></path></svg></a><a href="https://github.com/tudouPotatoo" target="_blank" rel="noopener noreferrer" class="authorSocialLink_owbf" title="GitHub"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 250" preserveAspectRatio="xMidYMid" style="--dark:#000;--light:#fff" class="authorSocialIcon_XYv3 githubSvg_Uu4N"><path d="M128.001 0C57.317 0 0 57.307 0 128.001c0 56.554 36.676 104.535 87.535 121.46 6.397 1.185 8.746-2.777 8.746-6.158 0-3.052-.12-13.135-.174-23.83-35.61 7.742-43.124-15.103-43.124-15.103-5.823-14.795-14.213-18.73-14.213-18.73-11.613-7.944.876-7.78.876-7.78 12.853.902 19.621 13.19 19.621 13.19 11.417 19.568 29.945 13.911 37.249 10.64 1.149-8.272 4.466-13.92 8.127-17.116-28.431-3.236-58.318-14.212-58.318-63.258 0-13.975 5-25.394 13.188-34.358-1.329-3.224-5.71-16.242 1.24-33.874 0 0 10.749-3.44 35.21 13.121 10.21-2.836 21.16-4.258 32.038-4.307 10.878.049 21.837 1.47 32.066 4.307 24.431-16.56 35.165-13.12 35.165-13.12 6.967 17.63 2.584 30.65 1.255 33.873 8.207 8.964 13.173 20.383 13.173 34.358 0 49.163-29.944 59.988-58.447 63.157 4.591 3.972 8.682 11.762 8.682 23.704 0 17.126-.148 30.91-.148 35.126 0 3.407 2.304 7.398 8.792 6.14C219.37 232.5 256 184.537 256 128.002 256 57.307 198.691 0 128.001 0Zm-80.06 182.34c-.282.636-1.283.827-2.194.39-.929-.417-1.45-1.284-1.15-1.922.276-.655 1.279-.838 2.205-.399.93.418 1.46 1.293 1.139 1.931Zm6.296 5.618c-.61.566-1.804.303-2.614-.591-.837-.892-.994-2.086-.375-2.66.63-.566 1.787-.301 2.626.591.838.903 1 2.088.363 2.66Zm4.32 7.188c-.785.545-2.067.034-2.86-1.104-.784-1.138-.784-2.503.017-3.05.795-.547 2.058-.055 2.861 1.075.782 1.157.782 2.522-.019 3.08Zm7.304 8.325c-.701.774-2.196.566-3.29-.49-1.119-1.032-1.43-2.496-.726-3.27.71-.776 2.213-.558 3.315.49 1.11 1.03 1.45 2.505.701 3.27Zm9.442 2.81c-.31 1.003-1.75 1.459-3.199 1.033-1.448-.439-2.395-1.613-2.103-2.626.301-1.01 1.747-1.484 3.207-1.028 1.446.436 2.396 1.602 2.095 2.622Zm10.744 1.193c.036 1.055-1.193 1.93-2.715 1.95-1.53.034-2.769-.82-2.786-1.86 0-1.065 1.202-1.932 2.733-1.958 1.522-.03 2.768.818 2.768 1.868Zm10.555-.405c.182 1.03-.875 2.088-2.387 2.37-1.485.271-2.861-.365-3.05-1.386-.184-1.056.893-2.114 2.376-2.387 1.514-.263 2.868.356 3.061 1.403Z"></path></svg></a><a href="https://thisweekinreact.com" target="_blank" rel="noopener noreferrer" class="authorSocialLink_owbf" title="newsletter"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="authorSocialIcon_XYv3"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M1.2 12a10.8 10.8 0 1 0 21.6 0a10.8 10.8 0 0 0 -21.6 0"></path><path d="M1.92 8.4h20.16"></path><path d="M1.92 15.6h20.16"></path><path d="M11.4 1.2a20.4 20.4 0 0 0 0 21.6"></path><path d="M12.6 1.2a20.4 20.4 0 0 1 0 21.6"></path></svg></a></div></div></div></div></div></header><div id="__blog-post-container" class="markdown"><p>最开始，是在看12306项目文档介绍数据库表如何设计的时候，感觉看的有些一知半解，看评论区有人推荐这部分内容先去学了分库分表再回来看，因此我决定先去学分库分表。</p>
+<p>一开始我去网上找分库分表相关的技术文章，看了一个高赞文章，感觉大概知道是啥意思，但是我记得我以前也看过分库分表的类似的文章，看的时候也能看懂，但是过一段时间就忘了，而且我感觉我虽然看的差不多，让我实际上手做，依然不会，因此我就去问了gemini这种情况应该怎么办</p>
+<blockquote>
+<p>You said</p>
+<p>我在学习分库分表，看了这篇文章：<a href="https://juejin.cn/post/7085132195190276109?searchId=2026031817005606A1CFB14127ABF092CC" target="_blank" rel="noopener noreferrer" class="">https://juejin.cn/post/7085132195190276109?searchId=2026031817005606A1CFB14127ABF092CC</a></p>
+<p>感觉一大问题就是，看了感觉好像懂了，过几天又忘了，怎么解决？</p>
+<p>Gemini said</p>
+<p>这种“一看就懂，一过就忘”的状态，在学习分布式系统这种<strong>工程实践性极强</strong>的知识时非常普遍。原因很简单：你目前的理解还停留在“语义层面”，没有转化为“肌肉记忆”和“场景直觉”。</p>
+<p>为了帮你彻底吃透分库分表，我建议采用<strong>三层递进法</strong>：</p>
+<p>第一层：从“背结论”转向“推逻辑”</p>
+<p>不要死记硬背分片的规则或术语，尝试通过<strong>核心痛点</strong>来倒推解决方案。如果再看那篇文章，尝试问自己以下问题：</p>
+<ul>
+<li class=""><strong>为什么要分？</strong>（单机存储容量瓶颈、I/O 并发瓶颈、CPU 计算瓶颈）。</li>
+<li class=""><strong>如果不分会怎样？</strong>（查询变慢、死锁增加、备份恢复灾难、索引失效）。</li>
+<li class=""><strong>分了之后有什么代价？</strong>（分布式事务、跨节点 Join、分页难题、非分区键查询、数据扩容迁移）。</li>
+</ul>
+<p>当你理解了每个方案都是为了平衡“扩展性”与“复杂度”时，你就不是在记知识点，而是在学习架构权衡。</p>
+<p>第二层：构建“结构化地图”</p>
+<p>分库分表的知识点很碎，你需要一个骨架把它们串起来。建议你动手画一张<strong>思维导图</strong>，包含以下四个象限：</p>
+<table><thead><tr><th>核心模块</th><th>关键技术点</th></tr></thead><tbody><tr><td><strong>切分策略</strong></td><td>水平分表、垂直分库、Range 分片、Hash 取模、一致性 Hash</td></tr><tr><td><strong>中间件选择</strong></td><td>客户端层（ShardingSphere-JDBC）、代理层（Mycat, ShardingSphere-Proxy）</td></tr><tr><td><strong>分布式挑战</strong></td><td>全局唯一 ID (Snowflake)、分布式事务 (2PC/TCC/Saga)、跨库 Join 优化</td></tr><tr><td><strong>扩容方案</strong></td><td>停机迁移、双写方案（增量+全量）、平滑扩容</td></tr></tbody></table>
+<p>第三层：实践出真知（最关键）</p>
+<p><strong>纸上得来终觉浅。</strong> 既然是程序员，最好的记忆方式就是写代码。我建议你花一个周末完成以下操作：</p>
+<ol>
+<li class=""><strong>快速搭建：</strong> 使用 Spring Boot 整合 <strong>ShardingSphere-JDBC</strong>。</li>
+<li class=""><strong>模拟场景：</strong> 模拟一个简单的“订单系统”，配置 2 库 4 表。</li>
+<li class=""><strong>观察行为：</strong>
+<ul>
+<li class="">执行一个带 <code>user_id</code> 的查询，看 SQL 是如何路由到特定表的。</li>
+<li class="">执行一个全表扫描的 Count 语句，看性能损耗和执行过程。</li>
+<li class="">尝试写一个全局 ID 生成器。</li>
+</ul>
+</li>
+<li class=""><strong>制造麻烦：</strong> 尝试把两个关联表分别存在不同库里，然后去写 Join 语句，看报错信息。</li>
+</ol>
+<p>给你的建议</p>
+<p><strong>不要试图一次性看完。</strong> 这种长文适合作为“查漏补缺”的字典。</p>
+<p><strong>下一步：</strong> 你想尝试搭建一个简单的分库分表 Demo 吗？我可以为你提供一个基于 Spring Boot 和 ShardingSphere 的基础配置模板，带你走一遍核心流程。</p>
+</blockquote>
+<p>通过各种看文章以及各种和gemini 的对话，我大概理清了我的学习方向：</p>
+<p>我觉得是不是应该先学一下理论：为什么要分库分表，不分会怎样，要怎么分，分了有什么后果，这些后果应该如何应对。学完理论之后要展开实践，例如自己创建一个项目，例如模拟美团外卖系统，模拟不分库分表，大数据量场景下是什么情况。改进之后，又是怎么样的性能。然后在业务场景，怎么解决事务问题等等。通过实践来真正构造一个有问题的场景，并且尝试去解决。</p>
+<p>我学了一下理论，然后我想通过自己在本地模拟那种从单机部署mysql --》大流量下mysql如何无法支撑 --》通过分库分表如何解决 --》然后又能够支撑大流量</p>
+<p>写到一半，感觉自己的理论知识还不足，例如不知道业界怎么做的，不知道怎么用shardingshpere...</p>
+<p>所以我感觉问题在于，我的理论知识还是不足，就好像是一个人学了加减乘除之后就尝试去解决一个微积分问题，中间的gap还很大，是不现实的。</p>
+<p>所以我之后做的事情是，再看了一遍之前的那个文章，这次边看边记录，然后最后自己靠自己的理解，不看资料，写给自己看，自己给自己解释，就类似于费曼学习法，保证自己是真的懂了。</p>
+<p>懂了之后，我准备学习shardingshpere，因为我确实不知道有什么学shardingshpere比较好的资料，而且之前看过的大佬介绍的都是让直接看官方文档，因此我也是直接看官方文档学习<a href="https://shardingsphere.apache.org/document/current/en/overview/" target="_blank" rel="noopener noreferrer" class="">https://shardingsphere.apache.org/document/current/en/overview/</a></p>
+<p>我觉得给我的感觉是，如果让我直接看官方文档，看的很迷糊，看不太懂。</p>
+<p>通过AI的协助能好很多，我觉得这是一种很高效的学习策略，借助AI去学习一手资料，而不是找很多二手资料去看。</p>
+<p>大概知道shardingshpere是干啥的，shardingshpere-JDBC和shardingshpere-proxy分别是啥之后，就去学习官网的quickstart部分<a href="https://shardingsphere.apache.org/document/current/en/quick-start/" target="_blank" rel="noopener noreferrer" class="">https://shardingsphere.apache.org/document/current/en/quick-start/</a> 这个网站给了一个<strong><a href="https://github.com/apache/shardingsphere/tree/master/examples" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/shardingsphere/tree/master/examples</a></strong> 这个代码库，我感觉这个代码库是学习shardingshpere非常好的一个材料。</p>
+<p>而且它很厉害的一点是他有一个example-generator，能够按照你的需求生成各种demo代码，供你学习。</p>
+<p>我在学这个 <a href="https://github.com/apache/shardingsphere/tree/master/examples" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/shardingsphere/tree/master/examples</a> 这个代码库的时候，其实一开始完全不知道怎么用</p>
+<p>因为我觉得他的readme写的不太清晰，而且readme的project structure还有写错的地方，让我一度怀疑这个repository是不是很久没有维护了</p>
+<p>不过看了一下最近commit的时间，好像还算活跃，所以我还是尝试搞懂这个怎么用的</p>
+<p>最有效的方式对我来说就是：</p>
+<p>直接在IDEA通过copliot问大模型：高亮部分是我的提问</p>
+<blockquote>
+<mark>我想通过这个example项目学习shardingshpere，应该怎么做？</mark>
+<p>如何一步步操作？
+请按照以下步骤生成并运行一个示例：
+第一步：准备数据库
+确保你本地启动了一个 MySQL 数据库，并且账号密码与 config.yaml 中配置的一致（默认是 root / 123456）。
+注意：生成的示例通常会自动帮你创建数据库（如 demo_ds, demo_ds_0 等），所以你只需要保证 MySQL 运行且账号有创建库的权限即可。
+第二步：配置生成器（可选）
+打开 shardingsphere-jdbc-example-generator/src/main/resources/config.yaml。 如果你想生成所有类型的示例，可以保持默认。如果你只想关注 Spring Boot + MyBatis + 分库分表，可以注释掉其他的配置，减少生成的时间和文件数量。
+第三步：运行生成器
+找到以下主类并运行它： 类名：org.apache.shardingsphere.example.generator.ExampleGeneratorMain 文件位置：shardingsphere-jdbc-example-generator/src/main/java/org/apache/shardingsphere/example/generator/ExampleGeneratorMain.java
+运行后，控制台会提示 Generated successful。
+第四步：找到生成的代码
+生成的代码位于： shardingsphere-jdbc-example-generator/target/generated-sources/shardingsphere-jdbc-sample
+在这个目录下，你会看到根据你配置生成的各种具体项目（例如 sharding--spring-boot-starter-mybatis--standalone--local）。
+第五步：运行生成的示例
+你需要用 IDE（如 IntelliJ IDEA）将生成的某个子文件夹（例如 sharding--spring-boot-starter-mybatis--standalone--local）作为一个新的 Maven 项目打开，或者在当前项目中把它添加为 Maven 模块，然后运行其中的 ExampleMain 类即可看到效果。</p>
+<mark>你推荐刚接触shardingshpere的人如何配置config.yaml?</mark>
+<p>对于刚接触 ShardingSphere 的新手，我建议从最基础、最核心的功能开始配置，避免一次性生成太多复杂的代码导致混乱。
+我已经帮你精简了 config.yaml 配置文件，保留了以下推荐组合：
+modes: standalone (单机模式)
+不需要由 ZooKeeper 或 Etcd 管理配置，最适合本地快速启动和学习。
+transactions: local (本地事务)
+先不涉及复杂的分布式事务（如 XA 或 Seata），专注理解 ShardingSphere 的基本行为。
+features: sharding (数据分片/分库分表)
+这是 ShardingSphere 最核心的功能。掌握了这个再学习读写分离（readwrite-splitting）或数据加密（encrypt）会更容易。
+frameworks: spring-boot-starter-mybatis
+Spring Boot + MyBatis 是目前 Java 开发中最主流的技术栈，生成的代码示例会更接近实际工作中的项目结构。
+如果你更习惯 JPA，也可以改用 spring-boot-starter-jpa。</p>
+<p>接下来怎么做
+确认数据库信息： 请检查 config.yaml 底部的 props 部分，确保 host, port, username, password 与你本地 MySQL 数据库一致。
+生成代码： 在 shardingsphere-jdbc-example-generator 目录下，找到并运行 ExampleGeneratorMain.java 的 main 方法。 或者使用 Maven 命令（如果你的环境配置好了）。
+查看生成的代码： 生成的项目代码会出现在： examples/shardingsphere-jdbc-example-generator/target/generated-sources/shardingsphere-jdbc-sample/ 目录下。
+运行示例： 进入生成的项目目录，由于它是 Spring Boot 项目，直接运行其中的 Application 主类即可启动。启动后它会自动创建表并插入测试数据。</p>
+<p>到这里，我就已经生成好了sharding--spring-boot-starter-mybatis--standalone--local项目</p>
+<p>一开始我直接在target那里打开项目，然后对pom.xml尝试add as maven，但是还是各种报错。</p>
+<p>后来我用一个新的idea窗口单独打开这个项目，就不再报错了。</p>
+<p>后续调研了一下原因：</p>
+<p>idea认为target目录是存放编译产物的地方，因此会自动忽略这个目录下的代码索引，也就是说如果直接打开target目录下的项目，是不会被maven解析的，也就会满屏报红。</p>
+<p>因此后续如果再遇到这样的情况，就用一个新的idea窗口单独打开这些生成出来的项目。</p>
+<p>然后我继续问AI（agent模式）</p>
+<mark>给我介绍一下这整个项目？</mark>
+<p>这是一个基于 Spring Boot + MyBatis + ShardingSphere-JDBC 的分库分表示例项目。
+主要用于演示在 Spring Boot 环境下，如何通过 ShardingSphere-JDBC 实现数据的水平分库、水平分表以及广播表功能。</p>
+<ol>
+<li class="">
+<p>项目结构概览
+入口类: ExampleMain.java
+标准的 Spring Boot 启动类，启动后会自动从容器中获取 ExampleService 并执行 run() 方法来演示完整的业务流程。
+业务逻辑: ExampleService.java
+定义了演示流程：初始化环境 -&gt; 插入数据 -&gt; 查询打印 -&gt; 删除数据 -&gt; 清理环境。
+数据访问层 (Repository):
+使用 MyBatis 实现，Mapper 接口位于 repository 包，XML 映射文件位于 src/main/resources/mappers。
+操作的实体包括：Order (订单), OrderItem (订单项), Address (地址)。
+配置文件:
+application.properties: Spring Boot 基础配置，指定了 MyBatis 的 Mapper 位置，并将数据源配置指向了 config.yaml。
+config.yaml: 核心配置文件，定义了 ShardingSphere 的分片规则。</p>
+</li>
+<li class="">
+<p>核心分片规则 (config.yaml)
+该项目配置了 3 个数据源 (ds_0, ds_1, ds_2)，但主要使用了 ds_0 和 ds_1 进行分片演示。
+分库策略 (Database Strategy):
+根据 user_id 进行分库。
+算法表达式：<code>ds_${user_id % 2}</code> (即偶数用户在 ds_0，奇数用户在 ds_1)。
+分表策略 (Table Strategy):
+t_order &amp; t_order_item:
+根据 order_id 进行分表。
+算法表达式：<code>t_order_${order_id % 2}</code> (即单数订单号在表_1，偶数在表_0)。
+实际数据节点配置为：<code>ds_$-&gt;{0..1}.t_order_$-&gt;{0..1}</code>，意味着数据会分布在 2 个库的 4 张表中。
+广播表 (Broadcast Table):
+t_address: 配置为广播表。意味着对该表的插入/更新操作会同时分发到所有数据源，查询时可从任意数据源获取。
+主键生成:
+使用了 SNOWFLAKE (雪花算法) 生成全局唯一的 order_id 和 order_item_id。</p>
+</li>
+<li class="">
+<p>运行流程 (ExampleService.run())
+Init: 创建表 t_order, t_order_item, t_address 并清空数据。
+Insert: 循环插入 10 条订单数据。
+user_id 从 1 到 10，会根据奇偶性路由到不同的数据库。
+Address 是广播表，会插入到所有定义的数据源中。
+Print: 调用 selectAll() 查询所有数据，展示分片后的聚合查询效果。
+Delete: 根据 order_id 删除数据。
+Clean: 删除创建的表。
+简单来说，这个项目是一个“麻雀虽小，五脏俱全”的 ShardingSphere-JDBC 最佳实践示例。</p>
+</li>
+</ol>
+<mark>我想通过这个项目学习ShardingSphere-JDBC，应该怎么做？</mark>
+<p>这是一个非常标准的 ShardingSphere-JDBC 分库分表入门示例项目。通过这个项目，你可以学习到如何在 Spring Boot + MyBatis 环境下配置和使用 ShardingSphere 来实现数的分片（Sharding）。
+这个项目演示了水平分库分表的核心功能：
+分库：将数据分散到不同的数据库实例（demo_ds_0, demo_ds_1）。
+分表：在同一个数据库内将数据分散到不同的表（t_order_0, t_order_1...）。
+广播表：所有库中都存在的表，数据完全一致（t_address）。
+分布式主键：使用雪花算法（Snowflake）生成全局唯一ID。
+核心学习步骤
+我建议你按照以下步骤来通过这个项目学习：</p>
+<ol>
+<li class="">理解核心配置 (config.yaml)
+ShardingSphere-JDBC 的灵魂在于配置。请打开 src/main/resources/config.yaml，这是定义分片规则的地方。
+数据源配置 (dataSources)：
+定义了3个逻辑数据源：ds_0, ds_1, ds_2（看起来 ds_2在这个例子中未被使用）。
+它们都指向本地 MySQL (localhost:3306)，但是库名不同 (demo_ds_0, demo_ds_1)。
+分片规则 (rules)：
+表规则 (tables)：
+t_order 的真实节点是 <code>ds_$-&gt;{0..1}.t_order_$-&gt;{0..1}</code>，这意味着数据会被打散到 2个库 * 2个表 = 4张表中 (ds_0.t_order_0, ds_0.t_order_1, ds_1.t_order_0, ds_1.t_order_1)。
+分片策略 (strategy)：
+分库策略 (databaseStrategy)：使用 user_id % 2。user_id 为偶数去 ds_0，奇数去 ds_1。
+分表策略 (tableStrategy)：使用 order_id % 2。order_id 为偶数去 _0 表，奇数去 _1 表。
+主键生成策略 (keyGenerateStrategy)：
+使用 SNOWFLAKE (雪花算法) 自动生成 order_id。
+广播表 (broadcastTables)：
+t_address 被定义为广播表。这意味着对这张表的插入/更新操作，会同时发送到所有数据源 (ds_0, ds_1)，保证每个库里这张表的数据完全一致。</li>
+<li class="">理解业务代码 (ExampleService.java)
+打开 src/main/java/org/apache/shardingsphere/example/sharding/spring/boot/starter/mybatis/service/ExampleService.java。
+代码并没有意识到“分库分表”的存在。它就像操作普通单库单表一样操作 OrderRepository。
+initEnvironment(): 创建表。ShardingSphere 会自动拦截 SQL 并根据规则在所有分片库中创建真实的物理表。
+insertData(): 插入数据。
+循环插入10条订单，userId 从 1 到 10。
+根据分库规则 (user_id % 2)，你会发现数据被均匀分配到了 ds_0 和 ds_1。
+printData(): 查询数据。
+selectAll() 会触发路由，ShardingSphere 会查询所有分片表并将结果归并后返回。</li>
+<li class="">运行并观察 (最重要的一步)
+要运行这个项目，你需要先准备好环境。
+前置准备：
+确保本地安装了 MySQL，并运行在端口 3306。
+确保 MySQL 用户名是 root，密码是 root (如果不是，请修改 config.yaml)。
+手动在 MySQL 中创建两个空数据库：
+CREATE DATABASE demo_ds_0;
+CREATE DATABASE demo_ds_1;
+(这一步必须手动做，ShardingSphere 不会自动创建数据库，只会在已有的库里建表)
+运行项目： 运行 ExampleMain.java。
+观察日志： 这是学习的关键！注意控制台打印的 Logic SQL (逻辑SQL) 和 Actual SQL (真实SQL)。 config.yaml 中开启了 sql-show: true，你可以看到 SQL 重写的过程。
+预期现象：
+当你插入 user_id=1 (奇数) 的订单时，你应该看到 SQL 被路由到了 demo_ds_1。
+当你查询所有数据时，你应该看到日志显示 ShardingSphere 并行查询了所有4张实际表。</li>
+</ol>
+<p>需要我帮你修改配置或准备运行环境吗？
+如果你本地的 MySQL 密码不是 root，或者想修改日志级别来更清楚地看 SQL，请告诉我。</p>
+<mark>我现在在通过shardingsphere-example学习shardingsphere的使用，我通过已经shardingsphere-jdbc-example-generator生成了sharding--spring-boot-starter-mybatis--standalone--local项目，并且已经学会了这个项目，下一步我应该继续通过shardingsphere-example学习更进阶的知识，还是通过直接通过看12306的相关代码进行学习？</mark>
+<p>恭喜你！手速很快。既然你已经跑通了 <code>generator</code> 生成的本地 Standalone（单机独立运行）项目，说明你已经掌握了 <strong>Sharding-JDBC 的基本配置语法、数据源映射和简单的分片运行逻辑</strong>。</p>
+<p>站在这个路口，我的建议非常明确：<strong>转向 12306 源码，但保留 ShardingSphere-example 作为“工具字典”。</strong></p>
+<p>原因如下：</p>
+<ol>
+<li class="">为什么现在该看 12306？</li>
+</ol>
+<p>你已经入职美团在即，12306 项目的架构思维与大厂后端高度一致。</p>
+<ul>
+<li class="">
+<p><strong>解决“真实痛点”：</strong> 官方 Example 的数据通常是 <code>order_id % 2</code> 这种理想化模型。而 12306 会告诉你：<strong>如果用户既想通过订单号查，又想通过用户 ID 查，该怎么分片？</strong>（这就涉及到了“基因分片”或“索引表”的概念）。</p>
+</li>
+<li class="">
+<p><strong>多组件协同：</strong> 在 12306 里，ShardingSphere 不是孤立的。你会看到它如何处理 <strong>分布式事务</strong>，以及如何与 <strong>Redis 缓存、RocketMQ 消息队列</strong> 配合。</p>
+</li>
+<li class="">
+<p><strong>工程化落地：</strong> 12306 展示了如何将分片算法封装成自定义类，而不是简单的 <code>inline</code> 表达式，这才是生产环境的代码风格。</p>
+</li>
+</ul>
+<ol start="2">
+<li class="">什么时候再回来翻 Example？</li>
+</ol>
+<p>当你阅读 12306 源码感到阻力时，Example 是最好的“功能验证工具”。</p>
+<ul>
+<li class="">
+<p><strong>遇到盲点：</strong> 比如你在 12306 看到某个配置看不懂（例如 <code>SPI</code> 加载的自定义算法），这时候回过头去 Example 搜对应的功能模块（比如 <code>sharding-spring-boot-starter-mybatis-example</code> 里的自定义分片部分），用最简单的代码跑一下，验证你的理解。</p>
+</li>
+<li class="">
+<p><strong>学习特定高级功能：</strong> 如果 12306 没用到 <strong>数据加密 (Masking)</strong> 或 <strong>影子库 (Shadow DB)</strong>，而你对此感兴趣，再去 Example 里精准寻找对应的 Sample。</p>
+</li>
+</ul>
+<ol start="3">
+<li class="">进阶学习路线：从 12306 出发</li>
+</ol>
+<p>我建议你直接打开 12306 的 <strong>订单模块 (Order Service)</strong>，重点攻克以下三个“进阶关卡”：</p>
+<p>第一关：复合分片策略 (Complex Sharding)</p>
+<ul>
+<li class=""><strong>观察点：</strong> 订单表是否只按一个字段分片？</li>
+<li class=""><strong>思考：</strong> 乘客查票（按用户 ID）和列车员验票（按订单号）如果分片键不一致，12306 是怎么通过 ShardingSphere 解决跨片查询问题的？</li>
+</ul>
+<p>第二关：分布式主键与雪花算法</p>
+<ul>
+<li class=""><strong>观察点：</strong> 找到主键生成的配置。</li>
+<li class=""><strong>思考：</strong> 它是如何保证在多个分库、多个微服务实例下，生成的订单 ID 绝对不重复且趋势递增的？</li>
+</ul>
+<p>第三关：性能优化与改写限制</p>
+<ul>
+<li class=""><strong>观察点：</strong> 观察 12306 中的分页查询。</li>
+<li class=""><strong>思考：</strong> ShardingSphere 在处理 <code>OFFSET 10000 LIMIT 10</code> 这种深分页时会有什么性能损耗？12306 是如何规避这种大翻页的？</li>
+</ul>
+<p>💡 你的下一步：</p>
+<p>你可以先尝试在 12306 源码中搜索 <strong><code>sharding</code></strong> 或者 <strong><code>Shardingsphere</code></strong> 关键字，找到它的配置文件（通常是 <code>yaml</code>）。</p>
+<p><strong>如果你在 12306 的配置里看到某一段配置（比如一段复杂的算法类路径或者特殊的路由规则）感到困惑，直接把那段配置贴给我。</strong> 我可以结合你刚刚学到的 Standalone 项目知识，告诉你 12306 在这里做了什么样的“高级封装”。</p>
+<p>你是打算从 12306 的哪个模块（订单、余票、支付）开始切入？</p>
+</blockquote>
+<p>到这里我就非常清楚应该怎么通过这个项目学习shardingshpere了</p>
+<p>我觉得重要的一点是：这次学习，我并不是完全没困难，而是我经历过不知道东西的优先级，先学什么再学什么，不知道什么东西要学到什么程度，不知道是先做项目再学还是学完再做项目，想学一个东西不知道用什么资料，知道了用什么资料不知道用这个资料怎么用，感觉就是各种摸索摸索，然后找到一个优解。我觉得重要的是，通过这次的经历，总结一套高效的、学习新东西的方法论，当以后学新东西的时候，可以更加有方向感。</p>
+<p>当你不知道怎么做，或者有疑问的时候，可以多跟ai对话，当然ai有的时候也不是说100%能给你有效的回答，但是多跟问他多跟他沟通，绝对要比你在互联网各种搜索，或者自己干想，效率高得多。但也不要100%听从ai，有的时候也要有自己的思考，自己的思考和ai的帮助结合在一起，是我认为最佳的ai使用方式。</p></div><footer class="docusaurus-mt-lg"><div class="row margin-top--sm theme-blog-footer-edit-meta-row"><div class="col"><b>标签：</b><ul class="tags_jXut padding--none margin-left--sm"><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/my-blog/blog/tags/学习心得">学习心得</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/my-blog/blog/tags/程序员成长">程序员成长</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/my-blog/blog/tags/经验总结">经验总结</a></li></ul></div></div><div class="row margin-top--sm theme-blog-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/blog/sharding-05-shardingsphere-learning-roadmap.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>编辑此页</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="博文分页导航"><a class="pagination-nav__link pagination-nav__link--prev" href="/my-blog/blog/sharding-series-04-shardingsphere-examples"><div class="pagination-nav__sublabel">较新一篇</div><div class="pagination-nav__label">Sharding Journey 04：手把手教你跑通 ShardingSphere-Example 示例项目</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/my-blog/blog/cache-penetration"><div class="pagination-nav__sublabel">较旧一篇</div><div class="pagination-nav__label">12306 核心实战：解决缓存穿透问题</div></a></nav></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/my-blog/docs/intro">Tutorial</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://stackoverflow.com/questions/tagged/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">Stack Overflow<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://discordapp.com/invite/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">Discord<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://x.com/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">X<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/my-blog/blog">Blog</a></li><li class="footer__item"><a href="https://github.com/facebook/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 My Project, Inc. Built with Docusaurus.</div></div></div></footer></div>
+</body>
+</html>
