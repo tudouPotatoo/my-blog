@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-Hans" dir="ltr" class="blog-wrapper blog-post-page plugin-blog plugin-id-default" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">全网写的最好的「缓存数据库一致性问题」 | My Site</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://tudouPotatoo.github.io/my-blog/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://tudouPotatoo.github.io/my-blog/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://tudouPotatoo.github.io/my-blog/blog/database-cache-consistency"><meta data-rh="true" property="og:locale" content="zh_Hans"><meta data-rh="true" name="docusaurus_locale" content="zh-Hans"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="zh-Hans"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="全网写的最好的「缓存数据库一致性问题」 | My Site"><meta data-rh="true" name="description" content="1. 先理解业务：一致性要求其实差别很大"><meta data-rh="true" property="og:description" content="1. 先理解业务：一致性要求其实差别很大"><meta data-rh="true" property="og:type" content="article"><meta data-rh="true" property="article:published_time" content="2026-05-17T06:58:30.000Z"><meta data-rh="true" property="article:author" content="https://github.com/tudouPotatoo"><meta data-rh="true" property="article:tag" content="Java,缓存,Redis,一致性"><link data-rh="true" rel="icon" href="/my-blog/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://tudouPotatoo.github.io/my-blog/blog/database-cache-consistency"><link data-rh="true" rel="alternate" href="https://tudouPotatoo.github.io/my-blog/blog/database-cache-consistency" hreflang="zh-Hans"><link data-rh="true" rel="alternate" href="https://tudouPotatoo.github.io/my-blog/blog/database-cache-consistency" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","@id":"https://tudouPotatoo.github.io/my-blog/blog/database-cache-consistency","mainEntityOfPage":"https://tudouPotatoo.github.io/my-blog/blog/database-cache-consistency","url":"https://tudouPotatoo.github.io/my-blog/blog/database-cache-consistency","headline":"全网写的最好的「缓存数据库一致性问题」","name":"全网写的最好的「缓存数据库一致性问题」","description":"1. 先理解业务：一致性要求其实差别很大","datePublished":"2026-05-17T06:58:30.000Z","author":{"@type":"Person","name":"tudouPotatoo","description":"software engineer","url":"https://github.com/tudouPotatoo","image":"https://github.com/tudouPotatoo.png"},"keywords":[],"isPartOf":{"@type":"Blog","@id":"https://tudouPotatoo.github.io/my-blog/blog","name":"Blog"}}</script><link rel="alternate" type="application/rss+xml" href="/my-blog/blog/rss.xml" title="My Site RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/my-blog/blog/atom.xml" title="My Site Atom Feed"><link rel="stylesheet" href="/my-blog/assets/css/styles.b5f1386e.css">
+<script src="/my-blog/assets/js/runtime~main.902ba71c.js" defer="defer"></script>
+<script src="/my-blog/assets/js/main.f6f4f6d8.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><link rel="preload" as="image" href="/my-blog/img/logo.svg"><link rel="preload" as="image" href="https://github.com/tudouPotatoo.png"><div role="region" aria-label="跳到主要内容"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">跳到主要内容</a></div><nav aria-label="主导航" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="切换导航栏" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/my-blog/"><div class="navbar__logo"><img src="/my-blog/img/logo.svg" alt="My Site Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/my-blog/img/logo.svg" alt="My Site Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">My Site</b></a><a class="navbar__item navbar__link" href="/my-blog/docs/intro">Tutorial</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/my-blog/blog">Blog</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/facebook/docusaurus" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="切换浅色/暗黑模式（当前为system mode）"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="container margin-vert--lg"><div class="row"><aside class="col col--3"><nav class="sidebar_re4s thin-scrollbar" aria-label="最近博文导航"><div class="sidebarItemTitle_pO2u margin-bottom--md">Recent posts</div><div role="group"><h3 class="yearGroupHeading_rMGB">2026</h3><ul class="sidebarItemList_Yudw clean-list"><li class="sidebarItem__DBe"><a aria-current="page" class="sidebarItemLink_mo7H sidebarItemLinkActive_I1ZP" href="/my-blog/blog/database-cache-consistency">全网写的最好的「缓存数据库一致性问题」</a></li><li class="sidebarItem__DBe"><a class="sidebarItemLink_mo7H" href="/my-blog/blog/sharding-series-01-foundations">Sharding Journey 01：深入浅出分库分表基础理论</a></li><li class="sidebarItem__DBe"><a class="sidebarItemLink_mo7H" href="/my-blog/blog/sharding-series-02-advanced">Sharding Journey 02：深入浅出分库分表进阶理论知识</a></li><li class="sidebarItem__DBe"><a class="sidebarItemLink_mo7H" href="/my-blog/blog/sharding-series-03-shardingsphere-intro">Sharding Journey 03：ShardingSphere理论与实践</a></li><li class="sidebarItem__DBe"><a class="sidebarItemLink_mo7H" href="/my-blog/blog/sharding-series-04-shardingsphere-examples">Sharding Journey 04：手把手教你跑通 ShardingSphere-Example 示例项目</a></li></ul></div></nav></aside><main class="col col--7"><article class=""><header><h1 class="title_f1Hy">全网写的最好的「缓存数据库一致性问题」</h1><div class="container_mt6G margin-vert--md"><time datetime="2026-05-17T06:58:30.000Z">2026年5月17日</time> · <!-- -->阅读需 18 分钟</div><div class="margin-top--md margin-bottom--sm row"><div class="col col--12 authorCol_Hf19"><div class="avatar margin-bottom--sm"><a class="avatar__photo-link" href="/my-blog/blog/authors/tudou-potatoo"><img class="avatar__photo authorImage_XqGP" src="https://github.com/tudouPotatoo.png" alt="tudouPotatoo"></a><div class="avatar__intro authorDetails_lV9A"><div class="avatar__name"><a href="/my-blog/blog/authors/tudou-potatoo"><span class="authorName_yefp" translate="no">tudouPotatoo</span></a></div><small class="authorTitle_nd0D" title="software engineer">software engineer</small><div class="authorSocials_rSDt"><a href="https://x.com/sebastienlorber" target="_blank" rel="noopener noreferrer" class="authorSocialLink_owbf" title="X"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 1200 1227" style="--dark:#000;--light:#fff" class="authorSocialIcon_XYv3 xSvg_y3PF"><path d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z"></path></svg></a><a href="https://www.linkedin.com/in/sebastienlorber/" target="_blank" rel="noopener noreferrer" class="authorSocialLink_owbf" title="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid" viewBox="0 0 256 256" style="--dark:#0a66c2;--light:#ffffffe6" class="authorSocialIcon_XYv3 linkedinSvg_FCgI"><path d="M218.123 218.127h-37.931v-59.403c0-14.165-.253-32.4-19.728-32.4-19.756 0-22.779 15.434-22.779 31.369v60.43h-37.93V95.967h36.413v16.694h.51a39.907 39.907 0 0 1 35.928-19.733c38.445 0 45.533 25.288 45.533 58.186l-.016 67.013ZM56.955 79.27c-12.157.002-22.014-9.852-22.016-22.009-.002-12.157 9.851-22.014 22.008-22.016 12.157-.003 22.014 9.851 22.016 22.008A22.013 22.013 0 0 1 56.955 79.27m18.966 138.858H37.95V95.967h37.97v122.16ZM237.033.018H18.89C8.58-.098.125 8.161-.001 18.471v219.053c.122 10.315 8.576 18.582 18.89 18.474h218.144c10.336.128 18.823-8.139 18.966-18.474V18.454c-.147-10.33-8.635-18.588-18.966-18.453"></path></svg></a><a href="https://github.com/tudouPotatoo" target="_blank" rel="noopener noreferrer" class="authorSocialLink_owbf" title="GitHub"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 250" preserveAspectRatio="xMidYMid" style="--dark:#000;--light:#fff" class="authorSocialIcon_XYv3 githubSvg_Uu4N"><path d="M128.001 0C57.317 0 0 57.307 0 128.001c0 56.554 36.676 104.535 87.535 121.46 6.397 1.185 8.746-2.777 8.746-6.158 0-3.052-.12-13.135-.174-23.83-35.61 7.742-43.124-15.103-43.124-15.103-5.823-14.795-14.213-18.73-14.213-18.73-11.613-7.944.876-7.78.876-7.78 12.853.902 19.621 13.19 19.621 13.19 11.417 19.568 29.945 13.911 37.249 10.64 1.149-8.272 4.466-13.92 8.127-17.116-28.431-3.236-58.318-14.212-58.318-63.258 0-13.975 5-25.394 13.188-34.358-1.329-3.224-5.71-16.242 1.24-33.874 0 0 10.749-3.44 35.21 13.121 10.21-2.836 21.16-4.258 32.038-4.307 10.878.049 21.837 1.47 32.066 4.307 24.431-16.56 35.165-13.12 35.165-13.12 6.967 17.63 2.584 30.65 1.255 33.873 8.207 8.964 13.173 20.383 13.173 34.358 0 49.163-29.944 59.988-58.447 63.157 4.591 3.972 8.682 11.762 8.682 23.704 0 17.126-.148 30.91-.148 35.126 0 3.407 2.304 7.398 8.792 6.14C219.37 232.5 256 184.537 256 128.002 256 57.307 198.691 0 128.001 0Zm-80.06 182.34c-.282.636-1.283.827-2.194.39-.929-.417-1.45-1.284-1.15-1.922.276-.655 1.279-.838 2.205-.399.93.418 1.46 1.293 1.139 1.931Zm6.296 5.618c-.61.566-1.804.303-2.614-.591-.837-.892-.994-2.086-.375-2.66.63-.566 1.787-.301 2.626.591.838.903 1 2.088.363 2.66Zm4.32 7.188c-.785.545-2.067.034-2.86-1.104-.784-1.138-.784-2.503.017-3.05.795-.547 2.058-.055 2.861 1.075.782 1.157.782 2.522-.019 3.08Zm7.304 8.325c-.701.774-2.196.566-3.29-.49-1.119-1.032-1.43-2.496-.726-3.27.71-.776 2.213-.558 3.315.49 1.11 1.03 1.45 2.505.701 3.27Zm9.442 2.81c-.31 1.003-1.75 1.459-3.199 1.033-1.448-.439-2.395-1.613-2.103-2.626.301-1.01 1.747-1.484 3.207-1.028 1.446.436 2.396 1.602 2.095 2.622Zm10.744 1.193c.036 1.055-1.193 1.93-2.715 1.95-1.53.034-2.769-.82-2.786-1.86 0-1.065 1.202-1.932 2.733-1.958 1.522-.03 2.768.818 2.768 1.868Zm10.555-.405c.182 1.03-.875 2.088-2.387 2.37-1.485.271-2.861-.365-3.05-1.386-.184-1.056.893-2.114 2.376-2.387 1.514-.263 2.868.356 3.061 1.403Z"></path></svg></a><a href="https://thisweekinreact.com" target="_blank" rel="noopener noreferrer" class="authorSocialLink_owbf" title="newsletter"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="authorSocialIcon_XYv3"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M1.2 12a10.8 10.8 0 1 0 21.6 0a10.8 10.8 0 0 0 -21.6 0"></path><path d="M1.92 8.4h20.16"></path><path d="M1.92 15.6h20.16"></path><path d="M11.4 1.2a20.4 20.4 0 0 0 0 21.6"></path><path d="M12.6 1.2a20.4 20.4 0 0 1 0 21.6"></path></svg></a></div></div></div></div></div></header><div id="__blog-post-container" class="markdown"><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="1-先理解业务一致性要求其实差别很大">1. 先理解业务：一致性要求其实差别很大<a href="#1-先理解业务一致性要求其实差别很大" class="hash-link" aria-label="1. 先理解业务：一致性要求其实差别很大的直接链接" title="1. 先理解业务：一致性要求其实差别很大的直接链接" translate="no">​</a></h2>
+<p>不同的业务场景对一致性的要求差别其实很大。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="11-低一致性场景">1.1 低一致性场景<a href="#11-低一致性场景" class="hash-link" aria-label="1.1 低一致性场景的直接链接" title="1.1 低一致性场景的直接链接" translate="no">​</a></h3>
+<p>很多互联网业务其实并不要求高一致性，短时间的不一致不会对业务造成影响。例如<strong>抖音热门视频点赞数、阅读量</strong></p>
+<p>这些数据通常具备几个特点：</p>
+<ul>
+<li class="">高并发读</li>
+<li class="">高并发写</li>
+<li class="">数据变化极快</li>
+</ul>
+<p>但与此同时没有人会真正关心到底是 10w 还是 10w+1。因此系统通常会优先保证性能，而不是强一致性，在这种场景会采用「最终一致性」方案。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="12-高一致性场景">1.2 高一致性场景<a href="#12-高一致性场景" class="hash-link" aria-label="1.2 高一致性场景的直接链接" title="1.2 高一致性场景的直接链接" translate="no">​</a></h3>
+<p>但并不是所有业务都能接受不一致。</p>
+<p>例如银行余额，你账户明明刚存了 1 万元，消费的时候由于读的是缓存的旧数据系统提示余额不足，诸如此类的问题会严重影响用户的信任，因此资金类业务通常会优先保证一致性，而不是极致性能。</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="2-缓存一致性问题到底是怎么产生的">2. 缓存一致性问题，到底是怎么产生的？<a href="#2-缓存一致性问题到底是怎么产生的" class="hash-link" aria-label="2. 缓存一致性问题，到底是怎么产生的？的直接链接" title="2. 缓存一致性问题，到底是怎么产生的？的直接链接" translate="no">​</a></h2>
+<p>理想的情况下，只有单线程在执行，也就是说没有任何并发，且每个操作都保证成功，那保证缓存一致性是非常容易的，例如先更新DB后更新缓存都是可以的。</p>
+<p>现实场景是，因为这是「A + B」两个步骤，所以有两种可能出现异常的场景：</p>
+<ol>
+<li class=""><strong>只有第一步成功，第二步失败</strong>。（两个都成功最好；两个都失败也没关系，没有出现缓存数据库不一致的情况；第一步失败，自然代码层面就报异常了，不会去执行第二步，所以也不会产生缓存数据库不一致的情况；因此只有第一步成功，第二步失败的场景可能出现不一致。）</li>
+<li class=""><strong>并发</strong>。由于网络存在延迟、抖动、丢包等问题，线程调度也不可控，所以在并发场景下可能会出现并发安全问题。</li>
+</ol>
+<p>场景1其实是比较好解决的，失败大不了就重试嘛，问题只是在于说重试的方式，怎么去做重试。</p>
+<p>场景2就不太好解决了，这类问题一出现，比较难排查，也不太好解决，所以我们尽量避免出现并发问题。</p>
+<p>我们需要基于现实情况，去分析这每一种方案的特点，才能知道每一种方案适合什么样的场景。</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="3-为什么更新缓存方案容易出问题">3. 为什么「更新缓存」方案容易出问题？<a href="#3-为什么更新缓存方案容易出问题" class="hash-link" aria-label="3. 为什么「更新缓存」方案容易出问题？的直接链接" title="3. 为什么「更新缓存」方案容易出问题？的直接链接" translate="no">​</a></h2>
+<p>其实在设计缓存一致性方案的时候，更新缓存是一种最直觉的方案。既然数据库改了，那我把缓存也一起改掉不就行了？</p>
+<p>甚至人们会觉得「更新缓存」比「删除缓存」更好。因为：</p>
+<ul>
+<li class="">缓存里永远都是最新值</li>
+<li class="">用户下一次读取时不需要重新查数据库</li>
+<li class="">不会出现缓存为空</li>
+</ul>
+<p>但实际上更新缓存远比删除缓存更危险，因为更新操作天然依赖<strong>顺序</strong>，而在高并发环境下，顺序恰恰是最难控制的东西。</p>
+<p>我们从下面两个方案，展开讨论一下为什么「更新缓存」更容易出问题？</p>
+<ul>
+<li class="">先更新缓存再更新数据库</li>
+<li class="">先更新数据库再更新缓存</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="31-先更新缓存再更新数据库">3.1 先更新缓存，再更新数据库<a href="#31-先更新缓存再更新数据库" class="hash-link" aria-label="3.1 先更新缓存，再更新数据库的直接链接" title="3.1 先更新缓存，再更新数据库的直接链接" translate="no">​</a></h3>
+<p>并发异常情况如图：</p>
+<p><img decoding="async" loading="lazy" alt="并发异常-先改缓存后改DB" src="/my-blog/assets/images/并发异常-先改缓存后改DB-401152d1cf1b5daf27601dcc6212f553.svg" class="img_ev3q"></p>
+<p>出现这个并发异常的条件是，在线程B「执行完更新缓存之后」以及「更新完DB之前」线程A要执行完「更新缓存」+「更新DB」</p>
+<p>其实这个异常出现的概率是非常高的，因为更新缓存是一个非常快的操作，线程A和B不会拉开多大的差距。所以可以理解为线程A和线程B以相同的起点，出发去抢DB的行锁，谁先抢到锁谁就先更新DB。</p>
+<p>也就是说，无法保证最后一个更新DB的线程就是最后一个更新缓存的线程。</p>
+<p>所以这个方案在并发场景下，出现「缓存数据库不一致」的概率是也比较高的。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="32-先更新数据库再更新缓存">3.2 先更新数据库，再更新缓存<a href="#32-先更新数据库再更新缓存" class="hash-link" aria-label="3.2 先更新数据库，再更新缓存的直接链接" title="3.2 先更新数据库，再更新缓存的直接链接" translate="no">​</a></h3>
+<p>并发异常情况如图：</p>
+<p><img decoding="async" loading="lazy" alt="并发异常-先改DB后改缓存" src="/my-blog/assets/images/并发异常-先改DB后改缓存-e8006f77d977008f6b31928bdd9535e4.svg" class="img_ev3q"></p>
+<p>出现该异常需要满足的条件是在线程A「执行完更新DB之后」以及「更新完缓存之前」线程B要执行完「更新DB」+「更新缓存」</p>
+<p>分析下来，出现异常的概率并不高。因为线程A写缓存是非常快的，在线程A更新完DB准备去写缓存到写完缓存这短短的几ms内，线程B要完成「更新DB」+「更新缓存」两个动作，可能性是比较低的。</p>
+<p>为验证出现异常的概率，我跑了一个测试代码，反映出【<strong>2</strong>个线程并发写+先改DB后改缓存】的方案出异常的概率在<strong>百分之20多</strong>。</p>
+<p>那是不是就是说就可以用这个方案呢？</p>
+<p>别急。我们上面讨论的是非常理想的，只有两个写线程的场景。实际的业务场景肯定是不止两个线程，可能有十几个线程在并发的执行。为了验证线程数量比较多的场景下，该方案会出现异常的概率是多少，我也跑了一个测试代码，反映出【<strong>20</strong>个线程并发写+先改DB后改缓存】的方案出异常的概率在<strong>百分之70多</strong>。</p>
+<p>只是增加了写线程的数量，为什么测试结果差距这么大？！</p>
+<p>原因是：在测试代码中有20个写线程在并发执行写操作，需要保证最后一个写Redis的线程，必须是最后一个写DB的线程，才能够保证一致性。但是在高并发场景下，写Redis本身是一个非常快的操作，加上存在网络抖动、线程调度等因素，很难做到最后一个写Redis的线程，一定是最后一个写DB的线程。只要其它的线程因为网络抖动等各种原因稍微慢了一点，它们就可能是最后一个写Redis的线程。</p>
+<p>也就是说最后写缓存的线程，未必是最后写数据库的线程。</p>
+<p>以一种并不精确的方式计算，在2个线程的场景，出现不一致的概率是1/2。而在20个线程的场景，出现不一致的概率就是19/20。所以才会出现测试结果差距如此大。</p>
+<p>我们可以看到不管是「先更新DB后更新缓存」还是「先更新缓存后更新DB」的方案，都非常依赖顺序。最后更新完DB的线程和最后更新完Redis的线程必须是同一个线程才能保证一致性。</p>
+<p>但是在并发、CPU调度、网络IO等因素的共同作用下，完美的顺序是很难达到的，因此更新缓存的方案是不被推荐的。</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="4-为什么业界更倾向删除缓存">4. 为什么业界更倾向「删除缓存」？<a href="#4-为什么业界更倾向删除缓存" class="hash-link" aria-label="4. 为什么业界更倾向「删除缓存」？的直接链接" title="4. 为什么业界更倾向「删除缓存」？的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="41-为什么删除更安全">4.1 为什么删除更安全？<a href="#41-为什么删除更安全" class="hash-link" aria-label="4.1 为什么删除更安全？的直接链接" title="4.1 为什么删除更安全？的直接链接" translate="no">​</a></h3>
+<p>我们知道了更新缓存不被推荐，是因为更新缓存对顺序性有很高的要求。那删除缓存会更好吗？</p>
+<p>删除操作有一个非常重要的特性：天然幂等。</p>
+<p>什么叫幂等？简单理解就是执行一次和执行十次结果一样。</p>
+<p>例如：</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">deleteCache()</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">deleteCache()</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">deleteCache()</span><br></span></code></pre></div></div>
+<p>最终结果仍然是缓存不存在。不会因为多删一次或者执行顺序不同导致数据错误。</p>
+<p>因此删除缓存，比更新缓存更适合高并发场景。</p>
+<p>我们根据「删除缓存」这种方案，分别对下面两种方案展开讨论</p>
+<ul>
+<li class="">先删除缓存再更新数据库</li>
+<li class="">先更新数据库再删除缓存</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="42-先删除缓存再更新数据库">4.2 先删除缓存，再更新数据库<a href="#42-先删除缓存再更新数据库" class="hash-link" aria-label="4.2 先删除缓存，再更新数据库的直接链接" title="4.2 先删除缓存，再更新数据库的直接链接" translate="no">​</a></h3>
+<p>并发异常情况如图：</p>
+<p><img decoding="async" loading="lazy" alt="并发异常-先删缓存后改DB" src="/my-blog/assets/images/并发异常-先删缓存后改DB-cacb5db8565b54e7dbbad509e4d2638e.svg" class="img_ev3q"></p>
+<p>出现该异常需要满足的条件是在线程A「执行完删除缓存之后」以及「更新完DB之前」线程B要执行完「读缓存」+「读DB」</p>
+<p>这个情况出现的概率也很高，因为读DB比写DB快多了，因此在线程A写完DB前线程B「读完缓存」+「读完DB」可能性是很大的。</p>
+<p>所以这个方案在并发场景下，出现「缓存数据库不一致」的概率是比较高的。</p>
+<p>这个并发异常，是有解决策略的，就是**「延迟双删」**策略，伪代码如下：</p>
+<div class="language-sql codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-sql codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic">#删除缓存</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">redis</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">delKey</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">X</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic">#更新数据库</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">db</span><span class="token punctuation" style="color:#393A34">.</span><span class="token keyword" style="color:#00009f">update</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">X</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic">#睡眠</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">Thread</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">sleep</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">N</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic">#再删除缓存</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">redis</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">delKey</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">X</span><span class="token punctuation" style="color:#393A34">)</span><br></span></code></pre></div></div>
+<p>出现异常的原因就是线程A删除了缓存之后，线程B读到旧数据并把旧数据又写回了缓存，线程A等一会再删一次缓存就好了。</p>
+<p>既然要等就涉及到要等多久？</p>
+<p>至少是要大于线程B「读完DB+写缓存」的耗时，但这个值在分布式和高并发场景难以准确评估，因为：</p>
+<ul>
+<li class="">DB 更新耗时不固定</li>
+<li class="">网络延迟不固定</li>
+<li class="">系统负载不固定</li>
+<li class="">GC 时间不固定</li>
+</ul>
+<p>所以一般都是凭借经验大致估算这个延迟时间，例如延迟 1-5s，<strong>只能尽可能地降低不一致的概率</strong>，而无法做到保证强一致性。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="54-先更新数据库再删除缓存">5.4 先更新数据库，再删除缓存<a href="#54-先更新数据库再删除缓存" class="hash-link" aria-label="5.4 先更新数据库，再删除缓存的直接链接" title="5.4 先更新数据库，再删除缓存的直接链接" translate="no">​</a></h3>
+<p>并发异常情况如图：</p>
+<p><img decoding="async" loading="lazy" alt="并发异常-先改DB后删缓存" src="/my-blog/assets/images/并发异常-先改DB后删缓存-f0d4f3fb1c3af285ee8aeb2a03ae8ac5.svg" class="img_ev3q"></p>
+<p>出现该异常需要满足的条件有：</p>
+<ul>
+<li class="">读写并发</li>
+<li class="">读缓存的时候缓存已失效</li>
+<li class="">在线程A「读完DB之后」以及「写缓存之前」线程B要执行完「写DB」+「删除缓存」</li>
+</ul>
+<p>这个情况出现可能性是非常低的，我们先只看条件3，我们知道写缓存本来就是很快的，写DB是很慢的。要在线程A写完缓存之前，线程B要完成「写DB+删除缓存」两个操作，可能性非常小。光光是条件3已经很难满足了，更加上条件2，要恰好线程A读缓存的时候缓存已失效，这就更难满足了。</p>
+<p>所以这个方案在并发场景下，也能比较好得保证「缓存数据库一致性」。这个方案也是最被广泛推崇的方案，名为Cache Aside策略，旁路缓存策略。</p>
+<p>这个方案也存在它的问题：</p>
+<ul>
+<li class="">
+<p>问题一：在高并发场景下，如果采用删除缓存的策略，很容易引发缓存击穿，此时应该选择最终一致性方案。</p>
+</li>
+<li class="">
+<p>问题二：「读写分离 + 主从复制延迟」</p>
+<p>例如：</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">线程t1写主库 price = 100。</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">线程t1删缓存。</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">线程t2读缓存为空。</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">线程t2读从库，由于此时主库还没有同步数据到从库，存在延迟，因此线程t2读到旧数据 price = 50。</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">线程t2将旧数据写缓存 price = 50。</span><br></span></code></pre></div></div>
+<p>解决问题二，可以采用「<strong>延迟双删</strong>」策略。</p>
+<p>线程t1在「主库完成同步数据到从库之后」在删一遍缓存即可，这样后续线程在从库读到的都是最新的数据。</p>
+<p>因此这里延迟双删延迟的时间要大于「主从复制延迟」的时间。</p>
+</li>
+</ul>
+<br>
+<p><strong>Cache Aside方案也存在问题为什么很多系统最终还是选择它？</strong></p>
+<p>因为它在一致性、复杂度、性能之间，取得了非常好的平衡。它并不是绝对不会出错，但它足够简单，足够稳定，异常概率也足够低。因此「先更新 DB，再删除缓存」，最终成为了业界最主流的缓存一致性方案。</p>
+<blockquote>
+<p>可以发现，在「更新缓存」的方案，我们讨论的都是写写并发的异常场景。在「删除缓存」的方案，我们讨论的都是读写并发的异常场景。原因是：</p>
+<p>在「更新缓存」的方案，由于缓存是一直存在的，所以读线程只会读不会写缓存。由写线程负责更新缓存，因此写写并发存在的顺序问题会诱发缓存相互覆盖的问题。</p>
+<p>在「删除缓存」的方案，写线程只会删除缓存，由于删除操作天然幂等，所以写写并发不会影响缓存的最终结果。更新缓存的动作由读线程在cache miss的时候触发，当读线程和写线程并发的时候，由于执行顺序问题，就会导致缓存中的值和DB中的值不一致。</p>
+<p>所以，本质是：在「更新缓存」的方案中，写写并发是主要矛盾。在「删除缓存」的方案，读写并发是主要矛盾。</p>
+</blockquote>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="6-第二步失败怎么办">6. 「第二步失败」怎么办？<a href="#6-第二步失败怎么办" class="hash-link" aria-label="6. 「第二步失败」怎么办？的直接链接" title="6. 「第二步失败」怎么办？的直接链接" translate="no">​</a></h2>
+<p>接下来我们继续讨论如何避免出现「只有第一步成功，第二步失败」的问题。</p>
+<p>我们前面也说到了，失败大不了就重试嘛，重试也是有讲究的，比如说你是选择同步重试还是异步重试？</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="61-同步重试">6.1 同步重试<a href="#61-同步重试" class="hash-link" aria-label="6.1 同步重试的直接链接" title="6.1 同步重试的直接链接" translate="no">​</a></h3>
+<p>同步重试就意味着你失败了立即重试，立即重试的问题在于：</p>
+<ul>
+<li class="">立即重试很大概率还会失败</li>
+<li class="">立即重试的次数设置为多少比较合理</li>
+<li class="">重试会一直占用着这个线程资源，无法服务其它客户端请求</li>
+<li class="">重试的过程中服务宕机了，这个重试请求就丢失了</li>
+</ul>
+<p>所以同步重试的问题本质是<strong>业务线程，不应该长期承担不确定操作</strong>。</p>
+<p>啥叫不确定操作？例如：</p>
+<ul>
+<li class="">网络恢复什么时候成功？</li>
+<li class="">Redis 什么时候恢复？</li>
+<li class="">重试多少次才够？</li>
+</ul>
+<p>这些其实都是不可预测的事情，不应该由主业务线程长期承担。</p>
+<p>因此同步重试，并不是高并发系统里优雅的解决方案。</p>
+<p>一般我们都会采取异步重试，异步重试有两种方案：</p>
+<ul>
+<li class="">采用MQ进行重试</li>
+<li class="">订阅binlog+MQ来实现重试</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="62-采用mq来进行重试">6.2 采用MQ来进行重试<a href="#62-采用mq来进行重试" class="hash-link" aria-label="6.2 采用MQ来进行重试的直接链接" title="6.2 采用MQ来进行重试的直接链接" translate="no">​</a></h3>
+<p>更新完DB之后，可以把删除缓存的请求封装为一条消息，写入MQ，让消费者异步地去删除缓存。</p>
+<p>这样不会占用着主线程资源，而且就算服务宕机了，消息也不会丢失，可靠性很高。</p>
+<p><img decoding="async" loading="lazy" alt="先改DB后删缓存 引入MQ异步删缓存" src="/my-blog/assets/images/先改DB后删缓存-引入MQ异步删缓存-1b4f71d54b3fd797da3cf0891a26facf.svg" class="img_ev3q"></p>
+<p>缺点：</p>
+<ul>
+<li class="">
+<p>如果应用程序恰好在写DB成功之后，发送MQ之前挂了，则这条消息就丢了，服务重启之后也只能等缓存自动过期。</p>
+<p>一种解决方案是先同步删一次缓存，只有当删除失败的时候再写入MQ，写缓存和写MQ同时失败是一个非常小概率的事件。但这依然也只是尽可能降低概率，无法保证消息一定能被写入MQ。</p>
+<p>另一种解决方案是通过引入本地消息表来保证消息一定被写入MQ，伪代码如下：</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">事务内：</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">1. update DB</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">2. 写 message_table</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">事务提交后：</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">异步扫描 message_table 发 MQ</span><br></span></code></pre></div></div>
+<p>但也提高了代码维护的复杂度。</p>
+</li>
+<li class="">
+<p>对业务代码侵入性比较强，每个写DB操作后都要写一段发MQ的代码。</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="63-订阅binlogmq来实现重试">6.3 订阅binlog+MQ来实现重试<a href="#63-订阅binlogmq来实现重试" class="hash-link" aria-label="6.3 订阅binlog+MQ来实现重试的直接链接" title="6.3 订阅binlog+MQ来实现重试的直接链接" translate="no">​</a></h3>
+<p>这种方案利用了 Canal 等工具，去监听数据库的Binlog，一旦发现有更新，就推送到 MQ。</p>
+<p>Canal工具的底层原理：master节点主从同步的时候会将binlog同步到各个从节点，以便于从节点回放binlog同步数据。Canal会模拟成MySQL集群中的一个salve节点，从而实时获取binlog日志。</p>
+<p>下图是订阅binlog+MQ来实现重试的完整流程</p>
+<p><img decoding="async" loading="lazy" alt="订阅binlog发送到MQ" src="/my-blog/assets/images/订阅binlog发送到MQ-f36e63f9bca1efb47ff5230460a5d3dd.svg" class="img_ev3q"></p>
+<p>优点：</p>
+<ul>
+<li class="">对业务代码侵入性低。主业务代码只管操作数据库，完全不需要关心缓存的事儿。数据库写成功了，Binlog 必然产生，canal会自动投递到MQ，消费者自然可以获取到消息继而去操作缓存。</li>
+<li class="">消息不会丢。只要数据库更新成功，binlog就一定存在。就算canal或者MQ挂了，重启之后依然可以根据消费者组的offset知道上一次消费到哪里，依然可以从上一次断开的地方继续往下执行。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li class="">维护起来更加复杂，需要引入canal组建。</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="64-引入mq重试需要考虑的问题">6.4 引入MQ重试需要考虑的问题<a href="#64-引入mq重试需要考虑的问题" class="hash-link" aria-label="6.4 引入MQ重试需要考虑的问题的直接链接" title="6.4 引入MQ重试需要考虑的问题的直接链接" translate="no">​</a></h3>
+<p>使用消息队列，需要考虑以下问题：</p>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="1️⃣如何避免重复消费问题保证消息只消费一次">1️⃣如何避免重复消费问题，保证消息只消费一次<a href="#1️⃣如何避免重复消费问题保证消息只消费一次" class="hash-link" aria-label="1️⃣如何避免重复消费问题，保证消息只消费一次的直接链接" title="1️⃣如何避免重复消费问题，保证消息只消费一次的直接链接" translate="no">​</a></h4>
+<p>MQ有三种投递语义：</p>
+<ul>
+<li class="">
+<p>At most once: 消息在传递时，最多会被送达一次。换一个说法就是，没什么消息可靠性保证，允许丢消息。</p>
+<p>一般都是一些对消息可靠性要求不太高的监控场景使用，比如每分钟上报一次机房温度数据，可以接受数据少量丢失。</p>
+</li>
+<li class="">
+<p>At least once: 消息在传递时，至少会被送达一次。也就是说，不允许丢消息，但是允许有少量重复消息出现。</p>
+</li>
+<li class="">
+<p>Exactly once：消息在传递时，只会被送达一次，不允许丢失也不允许重复，这个是最高的等级。</p>
+</li>
+</ul>
+<p>现在常用的绝大部分消息队列提供的服务质量都是 <code>At least once</code> ，RocketMQ、RabbitMQ 和 Kafka 都是这样。也就是说，消息队列很难保证消息不重复。</p>
+<p>所以我们无法从MQ层面去解决重复消费的问题，只能由消费者来保证幂等性。</p>
+<p>例如，当前场景是我们要通过MQ异步更新缓存，如何保证一条消息只被消费一次？</p>
+<p>解决方案：在Redis存储数据的时候也存储数据的版本（或者时间戳），投递消息的时候也记录消息的版本号。消费者从MQ获取到消息的时候，先检查一下消息的版本号，如果该版本号是小于等于当前Redis存储的数据的版本号，说明该消息已经被消费过，则不会再次消费。</p>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="2️⃣顺序性">2️⃣顺序性<a href="#2️⃣顺序性" class="hash-link" aria-label="2️⃣顺序性的直接链接" title="2️⃣顺序性的直接链接" translate="no">​</a></h4>
+<p>例如当前场景采用的是「先更新DB + 后通过MQ异步更新缓存」的策略</p>
+<p>你先把商品的价格改为100，然后又改为200。如果消息无序的话，有可能最终的执行顺序是先改为200，后改为100，这样肯定是不能接受的。怎么解决？</p>
+<ul>
+<li class="">
+<p>方案1：通过消息队列保证顺序性。</p>
+<p>Kafka能够保证同一个partition中的消息是按顺序消费，因此可以把同一条数据的变更发送到同一个partition内部，则如果写入的顺序是先改为100后改为200，则消费者的消费顺序也一定是先改为100后改为200。</p>
+</li>
+<li class="">
+<p>方案2：版本号/时间戳策略。</p>
+<p>如果你使用的MQ无法保证顺序性，使用版本号/时间戳策略可是可行的。</p>
+<p>例如：「消息1：把价格改为100 version=1」「消息2：把价格改为200 version=2」</p>
+<p>如果消费者先消费了消息2，把价格改为了200，后拿到消息1的时候发现version=1 &lt; 当前数据的version=2 则认为这条消息已经过期了，不会再消费。</p>
+</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="7-可以保证强一致性吗">7. 可以保证强一致性吗<a href="#7-可以保证强一致性吗" class="hash-link" aria-label="7. 可以保证强一致性吗的直接链接" title="7. 可以保证强一致性吗的直接链接" translate="no">​</a></h2>
+<p>我们引入 Redis 缓存的初衷是什么？是为了极致的性能和高吞吐。</p>
+<p>如果要求「强一致性」，唯一的方案是引入<strong>分布式读写锁</strong>。在写请求发生时，强行阻塞所有的读请求。</p>
+<p>然而，锁会带来严重的线程挂起和串行化吞吐，这直接抹杀了 Redis 作为内存缓存的高并发优势，与我们引入缓存的初衷<strong>背道而驰</strong>。</p>
+<p><strong>结论：</strong> 既然选择了缓存带来的高性能，就必须容忍常态下存在短暂的不一致窗口。</p>
+<p>我们的架构设计目标，不是消灭不一致，而是<strong>如何通过各种补偿机制，将这个不一致的时间窗口压缩得越短越好，实现「最终一致性」</strong>。</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="x-参考资料">X. 参考资料<a href="#x-参考资料" class="hash-link" aria-label="X. 参考资料的直接链接" title="X. 参考资料的直接链接" translate="no">​</a></h2>
+<ul>
+<li class=""><a href="http://kaito-kidd.com/2021/09/08/how-to-keep-cache-and-consistency-of-db/" target="_blank" rel="noopener noreferrer" class="">缓存和数据库一致性问题，看这篇就够了</a></li>
+<li class=""><a href="https://www.xiaolincoding.com/redis/architecture/mysql_redis_consistency.html" target="_blank" rel="noopener noreferrer" class="">数据库和缓存如何保证一致性？</a></li>
+<li class="">基于GPT-5.5的ChatGPT</li>
+</ul></div><footer class="docusaurus-mt-lg"><div class="row margin-top--sm theme-blog-footer-edit-meta-row"><div class="col"><b>标签：</b><ul class="tags_jXut padding--none margin-left--sm"><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/my-blog/blog/tags/java">Java</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/my-blog/blog/tags/缓存">缓存</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/my-blog/blog/tags/redis">Redis</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/my-blog/blog/tags/一致性">一致性</a></li></ul></div></div><div class="row margin-top--sm theme-blog-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/blog/database-cache-consistency.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>编辑此页</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="博文分页导航"><a class="pagination-nav__link pagination-nav__link--next" href="/my-blog/blog/sharding-series-01-foundations"><div class="pagination-nav__sublabel">较旧一篇</div><div class="pagination-nav__label">Sharding Journey 01：深入浅出分库分表基础理论</div></a></nav></main><div class="col col--2"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#1-先理解业务一致性要求其实差别很大" class="table-of-contents__link toc-highlight">1. 先理解业务：一致性要求其实差别很大</a><ul><li><a href="#11-低一致性场景" class="table-of-contents__link toc-highlight">1.1 低一致性场景</a></li><li><a href="#12-高一致性场景" class="table-of-contents__link toc-highlight">1.2 高一致性场景</a></li></ul></li><li><a href="#2-缓存一致性问题到底是怎么产生的" class="table-of-contents__link toc-highlight">2. 缓存一致性问题，到底是怎么产生的？</a></li><li><a href="#3-为什么更新缓存方案容易出问题" class="table-of-contents__link toc-highlight">3. 为什么「更新缓存」方案容易出问题？</a><ul><li><a href="#31-先更新缓存再更新数据库" class="table-of-contents__link toc-highlight">3.1 先更新缓存，再更新数据库</a></li><li><a href="#32-先更新数据库再更新缓存" class="table-of-contents__link toc-highlight">3.2 先更新数据库，再更新缓存</a></li></ul></li><li><a href="#4-为什么业界更倾向删除缓存" class="table-of-contents__link toc-highlight">4. 为什么业界更倾向「删除缓存」？</a><ul><li><a href="#41-为什么删除更安全" class="table-of-contents__link toc-highlight">4.1 为什么删除更安全？</a></li><li><a href="#42-先删除缓存再更新数据库" class="table-of-contents__link toc-highlight">4.2 先删除缓存，再更新数据库</a></li><li><a href="#54-先更新数据库再删除缓存" class="table-of-contents__link toc-highlight">5.4 先更新数据库，再删除缓存</a></li></ul></li><li><a href="#6-第二步失败怎么办" class="table-of-contents__link toc-highlight">6. 「第二步失败」怎么办？</a><ul><li><a href="#61-同步重试" class="table-of-contents__link toc-highlight">6.1 同步重试</a></li><li><a href="#62-采用mq来进行重试" class="table-of-contents__link toc-highlight">6.2 采用MQ来进行重试</a></li><li><a href="#63-订阅binlogmq来实现重试" class="table-of-contents__link toc-highlight">6.3 订阅binlog+MQ来实现重试</a></li><li><a href="#64-引入mq重试需要考虑的问题" class="table-of-contents__link toc-highlight">6.4 引入MQ重试需要考虑的问题</a></li></ul></li><li><a href="#7-可以保证强一致性吗" class="table-of-contents__link toc-highlight">7. 可以保证强一致性吗</a></li><li><a href="#x-参考资料" class="table-of-contents__link toc-highlight">X. 参考资料</a></li></ul></div></div></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/my-blog/docs/intro">Tutorial</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://stackoverflow.com/questions/tagged/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">Stack Overflow<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://discordapp.com/invite/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">Discord<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://x.com/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">X<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/my-blog/blog">Blog</a></li><li class="footer__item"><a href="https://github.com/facebook/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 My Project, Inc. Built with Docusaurus.</div></div></div></footer></div>
+</body>
+</html>
